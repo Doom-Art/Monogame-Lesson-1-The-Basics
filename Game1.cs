@@ -7,7 +7,7 @@ namespace Monogame_Lesson_1_The_Basics
 {
     public class Game1 : Game
     {
-        Texture2D dinoTexture;
+        Texture2D ghostTexture;
         Texture2D pacTexture;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -16,6 +16,7 @@ namespace Monogame_Lesson_1_The_Basics
         private int _y = 0;
         private int _xPac = 0;
         private int _yPac = 0;
+        private bool ghost = true;
 
         public Game1()
         {
@@ -39,7 +40,7 @@ namespace Monogame_Lesson_1_The_Basics
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            dinoTexture = Content.Load<Texture2D>("pacGhost");
+            ghostTexture = Content.Load<Texture2D>("pacGhost");
             pacTexture = Content.Load<Texture2D>("pac");
         }
 
@@ -47,15 +48,24 @@ namespace Monogame_Lesson_1_The_Basics
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) && _xPac < _graphics.PreferredBackBufferWidth-100)
-                _xPac+=5;
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) && _xPac > 0)
-                _xPac-=5;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) && _yPac < _graphics.PreferredBackBufferHeight-100)
-                _yPac+=5;
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) && _yPac > 0)
+            else if (Keyboard.GetState().IsKeyDown(Keys.Down) && _yPac < _graphics.PreferredBackBufferHeight - 100){
+                _yPac += 5;
+                pacTexture = Content.Load<Texture2D>("pacD");
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Up) && _yPac > 0) {
                 _yPac-=5;
-
+                pacTexture = Content.Load<Texture2D>("pac3");
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right) && _xPac < _graphics.PreferredBackBufferWidth - 100){
+                _xPac += 5;
+                pacTexture = Content.Load<Texture2D>("pac");
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right) && _xPac == _graphics.PreferredBackBufferWidth - 100)
+                _xPac = 0;
+            else if (Keyboard.GetState().IsKeyDown(Keys.Left) && _xPac > 0){
+                _xPac -= 5;
+                pacTexture = Content.Load<Texture2D>("pac2");
+            }
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -67,7 +77,8 @@ namespace Monogame_Lesson_1_The_Basics
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
-            _spriteBatch.Draw(dinoTexture, new Vector2(_x, _y), Color.White);
+            if (ghost)
+                _spriteBatch.Draw(ghostTexture, new Vector2(_x, _y), Color.White);
             _spriteBatch.Draw(pacTexture, new Vector2(_xPac, _yPac), Color.White);
             _spriteBatch.End();
             _x+=5;
@@ -78,7 +89,6 @@ namespace Monogame_Lesson_1_The_Basics
             if (+_y >= _graphics.PreferredBackBufferHeight){
                 _y = 0;
             }
-
 
             base.Draw(gameTime);
         }
